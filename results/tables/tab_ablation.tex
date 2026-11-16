@@ -1,0 +1,21 @@
+\begin{table*}[t]
+\centering
+\caption{Ablation of PHRNet (mean$\pm$std over 3 runs). Miss/FA: patient-level CRC risks (targets 0.05); Capture: share of high-risk hours placed in High/Critical. The first four rows share one trained network.}
+\label{tab:ablation}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Model} & \textbf{AUC} & \textbf{AUPRC} & \textbf{ECE} & \textbf{Miss} & \textbf{FA} & \textbf{Capture H/C} \\
+\midrule
+PHRNet (full) & 0.7724$\pm$0.0124 & 0.0942$\pm$0.0044 & \textbf{0.0010$\pm$0.0005} & 0.0458$\pm$0.0214 & 0.0518$\pm$0.0023 & \textbf{0.4394$\pm$0.0344} \\
+w/o temperature scaling & 0.7724$\pm$0.0124 & 0.0942$\pm$0.0044 & 0.0032$\pm$0.0007 & 0.0458$\pm$0.0214 & 0.0518$\pm$0.0023 & 0.4394$\pm$0.0344 \\
+w/o CRC (fixed cut-points) & 0.7724$\pm$0.0124 & 0.0942$\pm$0.0044 & 0.0010$\pm$0.0005 & 1.0000$\pm$0.0000 & \textbf{0.0000$\pm$0.0000} & 0.0000$\pm$0.0000 \\
+w/o disagreement escalation & 0.7724$\pm$0.0124 & 0.0942$\pm$0.0044 & 0.0010$\pm$0.0005 & 0.0503$\pm$0.0231 & 0.0518$\pm$0.0023 & 0.4394$\pm$0.0344 \\
+w/o feature-token attention & 0.7637$\pm$0.0031 & 0.0939$\pm$0.0053 & 0.0014$\pm$0.0004 & \textbf{0.0355$\pm$0.0168} & 0.0494$\pm$0.0037 & 0.4213$\pm$0.0266 \\
+w/o periodic embeddings & 0.7671$\pm$0.0194 & \textbf{0.0981$\pm$0.0131} & 0.0012$\pm$0.0002 & 0.0502$\pm$0.0083 & 0.0496$\pm$0.0041 & 0.4097$\pm$0.0392 \\
+w/o BatchEnsemble head (MC dropout) & \textbf{0.7764$\pm$0.0204} & 0.0926$\pm$0.0116 & 0.0015$\pm$0.0003 & 0.0477$\pm$0.0146 & 0.0490$\pm$0.0008 & 0.4355$\pm$0.0340 \\
+\bottomrule
+\end{tabular}
+\end{table*}

@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite it as below."
+title: "PHRNet: Patient-Level Conformal Risk Control for Guaranteed Early-Warning Risk Stratification from IoT Vital Signs"
+type: software
+license: MIT
+authors:
+  - family-names: Lonkar
+    given-names: Laxman Kisan
+  - family-names: Ghorsade
+    given-names: Onkar Pundlik
+  - family-names: Hule
+    given-names: Mangesh Sakharam
+  - family-names: Pawar
+    given-names: Pooja Ramsing
+  - family-names: Kale
+    given-names: Vishal Baburao
+date-released: 2026-11-16

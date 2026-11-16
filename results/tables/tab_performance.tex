@@ -1,0 +1,24 @@
+\begin{table*}[t]
+\centering
+\caption{Discrimination on the held-out test split (mean$\pm$std over 10 independent runs). F1, sensitivity and specificity use the threshold that maximizes F1 on the validation split; Sens@Spec90 uses the validation threshold giving 90\% specificity. Best mean in bold.}
+\label{tab:performance}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Model} & \textbf{AUC} & \textbf{AUPRC} & \textbf{F1} & \textbf{Sensitivity} & \textbf{Specificity} & \textbf{Sens@Spec90} \\
+\midrule
+Logistic Regression & 0.7130$\pm$0.0273 & 0.0734$\pm$0.0088 & 0.1559$\pm$0.0119 & 0.2528$\pm$0.0581 & 0.9632$\pm$0.0122 & 0.4270$\pm$0.0511 \\
+Random Forest & 0.7682$\pm$0.0144 & 0.0870$\pm$0.0150 & 0.1630$\pm$0.0145 & 0.2447$\pm$0.0557 & 0.9675$\pm$0.0111 & 0.4523$\pm$0.0465 \\
+XGBoost & \textbf{0.7954$\pm$0.0208} & \textbf{0.0981$\pm$0.0078} & 0.1728$\pm$0.0088 & 0.2747$\pm$0.0750 & 0.9649$\pm$0.0142 & 0.4997$\pm$0.0511 \\
+LightGBM & 0.7891$\pm$0.0213 & 0.0888$\pm$0.0112 & 0.1708$\pm$0.0119 & \textbf{0.3088$\pm$0.0578} & 0.9572$\pm$0.0120 & 0.4859$\pm$0.0500 \\
+CatBoost & 0.7901$\pm$0.0231 & 0.0964$\pm$0.0124 & 0.1764$\pm$0.0146 & 0.2866$\pm$0.0660 & 0.9633$\pm$0.0143 & \textbf{0.4998$\pm$0.0528} \\
+MLP & 0.7704$\pm$0.0190 & 0.0876$\pm$0.0106 & 0.1722$\pm$0.0165 & 0.2630$\pm$0.0590 & 0.9662$\pm$0.0144 & 0.4637$\pm$0.0526 \\
+Attention-MLP + MC dropout & 0.7589$\pm$0.0212 & 0.0846$\pm$0.0115 & 0.1667$\pm$0.0142 & 0.2644$\pm$0.0517 & 0.9648$\pm$0.0098 & 0.4502$\pm$0.0402 \\
+Deep Ensemble (5 MLPs) & 0.7747$\pm$0.0185 & 0.0922$\pm$0.0118 & \textbf{0.1775$\pm$0.0161} & 0.2671$\pm$0.0677 & 0.9671$\pm$0.0154 & 0.4681$\pm$0.0477 \\
+FT-Transformer & 0.7773$\pm$0.0217 & 0.0979$\pm$0.0129 & 0.1768$\pm$0.0142 & 0.2566$\pm$0.0621 & \textbf{0.9693$\pm$0.0129} & 0.4798$\pm$0.0507 \\
+PHRNet (Proposed) & 0.7833$\pm$0.0201 & 0.0937$\pm$0.0117 & 0.1733$\pm$0.0180 & 0.2918$\pm$0.0583 & 0.9613$\pm$0.0117 & 0.4809$\pm$0.0439 \\
+\bottomrule
+\end{tabular}
+\end{table*}

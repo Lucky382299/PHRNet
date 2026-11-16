@@ -1,0 +1,23 @@
+\begin{table}[t]
+\centering
+\caption{Decision layer of PHRNet on the test patients (mean$\pm$std over 10 runs, \%). Patient-level risks are the CRC losses: the average, over patients, of the fraction of their high-risk (or low-risk) hours that land in the stated tiers. Targets hold in expectation over calibration draws.}
+\label{tab:tiers_guarantee}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lccc}
+\toprule
+\textbf{Quantity} & \textbf{Target} & \textbf{CRC tiers} & \textbf{Fixed 0.2/0.4/0.6/0.8} \\
+\midrule
+High-risk hours in Very Low & $\leq 2$ & 1.16$\pm$0.99 & 92.92$\pm$4.00 \\
+High-risk hours in Very Low/Low & $\leq 5$ & 3.98$\pm$1.50 & 99.99$\pm$0.02 \\
+Low-risk hours in Critical & $\leq 2$ & 1.89$\pm$0.23 & 0.00$\pm$0.00 \\
+Low-risk hours in High/Critical & $\leq 5$ & 4.95$\pm$0.43 & 0.00$\pm$0.00 \\
+\midrule
+High-risk hours in High/Critical & -- & 44.42$\pm$4.07 & 0.00$\pm$0.00 \\
+Septic patients with a High/Critical alert & -- & 61.97$\pm$4.55 & 0.00$\pm$0.00 \\
+Non-septic patients with a High/Critical alert & -- & 25.55$\pm$1.37 & 0.00$\pm$0.00 \\
+Hours escalated by member disagreement & -- & 5.20$\pm$0.31 & -- \\
+\bottomrule
+\end{tabular}}
+\end{table}

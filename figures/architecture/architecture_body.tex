@@ -1,0 +1,145 @@
+\begin{tikzpicture}[
+  font=\sffamily\scriptsize, >={Stealth[length=2mm]},
+  stage/.style={draw=#1!65!black, rounded corners=5pt, fill=#1!4, line width=0.7pt},
+  blk/.style={draw=#1!65!black, rounded corners=2pt, fill=#1!14, align=center, line width=0.5pt, inner sep=2pt, font=\sffamily\scriptsize},
+  sub/.style={draw=#1!65!black, rounded corners=3pt, fill=#1!7, line width=0.6pt},
+  tok/.style={draw=#1!65!black, fill=#1!28, minimum width=3.2mm, minimum height=3.2mm, inner sep=0pt},
+  flow/.style={->, line width=0.9pt, draw=black!75},
+  thin/.style={->, line width=0.45pt, draw=black!60},
+  ttl/.style={font=\sffamily\bfseries\small, text=#1!55!black}]
+
+%==================== A. IoT data layer ====================
+\draw[stage=gray] (0,0) rectangle (3.2,-7.5);
+\node[ttl=gray, anchor=north] at (1.6,-0.12) {A. IoT data layer};
+\foreach \i/\sym/\name in {0/HR/Heart rate, 1/O$_2$/Oxygen saturation, 2/T/Temperature, 3/BP/Blood pressure, 4/RR/Respiratory rate}{
+  \node[circle, draw=red!60!black, fill=red!10, minimum size=5.4mm, inner sep=0pt, font=\sffamily\tiny\bfseries] (s\i) at (0.5,-0.95-0.6*\i) {\sym};
+  \node[anchor=west, font=\sffamily\tiny] at (0.85,-0.95-0.6*\i) {\name};}
+\draw[black!25, line width=0.4pt] (0.2,-3.65) -- (3.0,-3.65);
+\node[blk=gray, text width=2.75cm, anchor=north] (hourly) at (1.6,-3.85) {\textbf{Hourly record $x_{jt}$}\\[1pt]{\tiny 7 vital signs, their 6-h means and 6-h changes, age, sex, ICU and hospital time ($m=25$)}};
+\node[blk=gray, text width=2.75cm, minimum height=1.65cm, anchor=north] (split) at (1.6,-5.6) {};
+\node[font=\sffamily\bfseries\scriptsize, anchor=north] at (1.6,-5.7) {Patient-level split};
+\fill[blue!50] (0.4,-6.2) rectangle (2.08,-6.42); \fill[green!50!black!60] (2.08,-6.2) rectangle (2.32,-6.42);
+\fill[orange!75] (2.32,-6.2) rectangle (2.56,-6.42); \fill[gray!60] (2.56,-6.2) rectangle (2.8,-6.42);
+\node[font=\sffamily\tiny, align=center] at (1.6,-6.8) {train $|$ val $|$ cal $|$ test\\70 : 10 : 10 : 10 (\% patients)\\all hours of a patient in one split};
+\draw[thin] (hourly) -- (split);
+
+
+%==================== B. Learning stage ====================
+\draw[stage=blue] (3.4,0) rectangle (16,-7.5);
+\node[ttl=blue, anchor=north] at (9.7,-0.12) {B. Learning stage \mdseries\scriptsize(training patients, original binary labels)};
+
+% B1 tokenizer
+\draw[sub=blue] (3.6,-0.7) rectangle (6.75,-5.1);
+\node[font=\sffamily\bfseries\scriptsize, anchor=north] at (5.175,-0.75) {Feature tokenizer};
+\draw[blue!70!black, line width=0.7pt, domain=0:2.4, samples=70, smooth, shift={(3.97,-1.45)}] plot (\x, {0.16*sin(3.4*\x r)});
+\draw[orange!80!black, line width=0.7pt, domain=0:2.4, samples=70, smooth, shift={(3.97,-1.45)}] plot (\x, {0.16*cos(3.4*\x r)});
+\node[font=\sffamily\tiny, align=center] at (5.175,-2.05) {$e_j=\mathrm{ReLU}\big(W_j[\sin 2\pi c_jx_j,$\\$\cos 2\pi c_jx_j]+b_j\big)$};
+\node[font=\sffamily\tiny, align=center, text=black!65] at (5.175,-2.7) {periodic embedding per numerical\\feature; lookup embedding for sex};
+\node[font=\sffamily\tiny, anchor=north] at (5.175,-3.2) {token sequence $Z^0\in\mathbb{R}^{(m+1)\times d}$};
+\node[tok=red] (t0) at (4.05,-3.85) {};
+\foreach \i in {1,...,5}{\node[tok=blue] (t\i) at (4.05+0.4*\i,-3.85) {};}
+\node[font=\sffamily\tiny] at (6.45,-3.85) {$\cdots$};
+\node[font=\sffamily\tiny] at (4.05,-4.25) {\textsc{cls}};
+\node[font=\sffamily\tiny] at (5.25,-4.25) {$e_1\quad e_2\quad\cdots\quad e_m$};
+\node[font=\sffamily\tiny, text=black!65] at (5.175,-4.75) {$d=64$, $F=16$ frequencies};
+
+% B2 transformer
+\draw[sub=blue] (7.05,-0.7) rectangle (10.55,-5.1);
+\node[font=\sffamily\bfseries\scriptsize, anchor=north] at (8.8,-0.75) {Transformer encoder ($\times L$)};
+
+\node[blk=cyan, minimum width=2.6cm, anchor=north] (ln1) at (8.95,-1.5) {LayerNorm};
+\node[blk=violet, minimum width=2.6cm, below=1.6mm of ln1] (mhsa) {Multi-head self-attention};
+\node[circle, draw, inner sep=0pt, minimum size=3.2mm, below=1.6mm of mhsa] (add1) {\tiny$+$};
+\node[blk=cyan, minimum width=2.6cm, below=1.6mm of add1] (ln2) {LayerNorm};
+\node[blk=teal, minimum width=2.6cm, below=1.6mm of ln2] (ffn) {Feed-forward (GELU)};
+\node[circle, draw, inner sep=0pt, minimum size=3.2mm, below=1.6mm of ffn] (add2) {\tiny$+$};
+\draw[thin] (ln1) -- (mhsa); \draw[thin] (mhsa) -- (add1); \draw[thin] (add1) -- (ln2); \draw[thin] (ln2) -- (ffn); \draw[thin] (ffn) -- (add2);
+\coordinate (in1) at ($(ln1.north)+(0,0.18)$);
+\draw[thin] ($(in1)+(0,0.12)$) -- (ln1.north);
+\draw[thin, rounded corners=2pt] (in1) -| (7.35,-2.35) |- (add1.west);
+\draw[thin, rounded corners=2pt] ($(add1.south)+(0,-0.07)$) -| (10.3,-3.75) |- (add2.east);
+\node[font=\sffamily\tiny, rotate=90, text=black!60] at (7.22,-2.15) {residual};
+\node[font=\sffamily\tiny, text=black!65] at (8.8,-4.85) {$L=3$ layers, 8 heads};
+
+% attention map (under transformer)
+\node[font=\sffamily\tiny, anchor=north] at (8.8,-5.25) {[CLS] and feature attention};
+\foreach \r in {0,...,5}{\foreach \c in {0,...,5}{
+  \pgfmathtruncatemacro{\v}{mod(37*\r+53*\c+11*\r*\c+7,90)+5}
+  \fill[violet!\v!white] (8.26+0.18*\c,-5.6-0.18*\r) rectangle ++(0.18,-0.18);}}
+\draw[violet!60!black] (8.26,-5.6) rectangle (9.34,-6.68);
+\node[font=\sffamily\tiny, anchor=west, align=left, text=black!70] at (9.45,-6.14) {explains which\\vital signs\\drive each tier};
+
+% B3 BatchEnsemble head
+\draw[sub=blue] (10.85,-0.7) rectangle (15.8,-5.1);
+\node[font=\sffamily\bfseries\scriptsize, anchor=north] at (13.325,-0.75) {BatchEnsemble head (TabM-style)};
+\node[blk=blue, minimum width=4.4cm, anchor=north] (W) at (13.325,-1.25) {shared weights $W$ (one copy for all members)};
+\foreach \k/\y/\c in {1/0/orange, 2/1/green, K/3/purple}{
+  \node[draw=\c!70!black, fill=\c!14, rounded corners=1.5pt, minimum width=4.4cm, minimum height=4.2mm, font=\sffamily\tiny] (m\k) at (13.325,-2.15-0.55*\y) {member $\k$:\; $\big((u\odot r_{\k})W\big)\odot s_{\k}+b_{\k}$\; $\rightarrow\ \ell_{\k}$};}
+\node[font=\sffamily\tiny] at (13.325,-3.18) {$\vdots$};
+\draw[thin] (W.south) -- (m1.north);
+\node[font=\sffamily\tiny, align=center, anchor=north] (logits) at (13.325,-4.0) {$K=16$ members, \textbf{one forward pass}\\random-sign adapters $r_k$ keep members diverse};
+
+% loss
+\node[blk=red, text width=11.9cm, anchor=south] (loss) at (9.7,-7.35) {\textbf{Training:} mean binary cross-entropy over all $K$ members $\cdot$ AdamW $\cdot$ early stopping on validation log-loss};
+\draw[->, dashed, red!60!black, line width=0.6pt] (13.325,-5.1) -- (13.325,-6.82);
+\node[font=\sffamily\tiny, text=red!60!black, anchor=west] at (13.4,-5.95) {$\ell_1,\dots,\ell_K$ vs.\ $y_{jt}$};
+
+% arrows in B
+\draw[flow] (6.75,-2.9) -- (7.05,-2.9);
+\draw[flow] (10.55,-2.9) -- node[above, font=\sffamily\tiny]{$h$} (10.85,-2.9);
+\draw[flow, rounded corners=4pt] (split.east) -- (3.3,-6.43) |- (3.6,-2.9);
+
+\begin{scope}[yshift=1.1cm]
+%==================== C. Decision stage ====================
+\draw[stage=orange] (0,-9.15) rectangle (16,-13.45);
+\node[ttl=orange, anchor=north west] at (0.15,-9.27) {C. Decision stage \mdseries\scriptsize(validation and calibration patients; no retraining, no relabeling)};
+% calibration
+\draw[sub=orange] (0.2,-9.85) rectangle (3.2,-13.25);
+\node[font=\sffamily\bfseries\scriptsize, anchor=north] at (1.7,-9.9) {Calibration};
+\node[font=\sffamily\tiny, align=center, anchor=north] at (1.7,-10.35) {temperature $T$ fitted\\on validation patients\\[4pt]
+$p_k=\sigma(\ell_k/T)$\\[2pt] mean risk $\bar p=\frac1K\sum_k p_k$\\[2pt] disagreement\\$u=\mathrm{std}_k(\ell_k/T)$};
+% CRC
+\draw[sub=orange] (3.5,-9.85) rectangle (7.85,-13.25);
+\node[font=\sffamily\bfseries\scriptsize, anchor=north] at (5.675,-9.9) {Patient-level conformal risk control};
+\foreach \p/\pat in {0/{1,1,0,0,0,1,1,1,0,0}, 1/{0,0,0,0,0,0,0,0,0,0}, 2/{0,0,0,1,1,1,1,0,0,0}}{
+  \pgfmathtruncatemacro{\pp}{\p+1}
+  \node[font=\sffamily\tiny, anchor=east] at (4.15,-10.55-0.32*\p) {pt.\,\pp};
+  \foreach \v [count=\h from 0] in \pat {
+    \ifnum\v=1 \fill[red!65] (4.2+0.2*\h,-10.47-0.32*\p) rectangle ++(0.17,-0.17);
+    \else \fill[blue!30] (4.2+0.2*\h,-10.47-0.32*\p) rectangle ++(0.17,-0.17); \fi }}
+\node[font=\sffamily\tiny, anchor=west, align=left] at (6.25,-10.85) {hours of each\\calibration patient\\{\color{red!70}$\blacksquare$} high-risk\\{\color{blue!45}$\blacksquare$} low-risk};
+\node[font=\sffamily\tiny, align=center, anchor=north] at (5.675,-11.6) {one loss per patient:\\$M_j(\tau)$ = share of high-risk hours with $\bar p<\tau$\\$F_j(\tau)$ = share of low-risk hours with $\bar p\ge\tau$\\[3pt] CRC rule: $\frac{n}{n+1}\hat R(\tau)+\frac{1}{n+1}\le\alpha$\\$\Rightarrow\ \tau_{L1},\ \tau_{L2},\ \tau_{H2},\ \tau_{H1}$};
+% tiers
+\draw[sub=orange] (8.15,-9.85) rectangle (12.6,-13.25);
+\node[font=\sffamily\bfseries\scriptsize, anchor=north] at (10.375,-9.9) {Risk tiers with guaranteed errors};
+\fill[green!50!black!60] (8.4,-10.55) rectangle (9.05,-10.9);
+\fill[green!30] (9.05,-10.55) rectangle (9.65,-10.9);
+\fill[yellow!55] (9.65,-10.55) rectangle (11.15,-10.9);
+\fill[orange!70] (11.15,-10.55) rectangle (11.75,-10.9);
+\fill[red!70] (11.75,-10.55) rectangle (12.3,-10.9);
+\draw[->, line width=0.6pt] (8.4,-10.9) -- (12.45,-10.9) node[below, font=\sffamily\tiny]{$\bar p$};
+\foreach \x/\t in {9.05/{$\tau'_{L1}$}, 9.65/{$\tau'_{L2}$}, 11.15/{$\tau_{H2}$}, 11.75/{$\tau_{H1}$}}{\draw (\x,-10.5) -- (\x,-10.97); \node[font=\sffamily\tiny, anchor=north] at (\x,-10.95) {\t};}
+\foreach \x/\t in {8.72/VL, 9.35/L, 10.4/Moderate, 11.45/H, 12.02/C}{\node[font=\sffamily\tiny\bfseries] at (\x,-10.72) {\t};}
+\node[font=\sffamily\tiny, align=center, anchor=north] at (10.375,-11.6) {for a new patient, in expectation:\\[2pt]
+missed: $\mathbb{E}[M(\mathrm{VL,L})]{\le}5\%$, $\mathbb{E}[M(\mathrm{VL})]{\le}2\%$\\
+false alarm: $\mathbb{E}[F(\mathrm{H,C})]{\le}5\%$, $\mathbb{E}[F(\mathrm{C})]{\le}2\%$\\[3pt]
+valid although hours of a\\patient are correlated};
+% escalation + alerts
+\draw[sub=violet] (12.9,-9.85) rectangle (15.8,-13.25);
+\node[font=\sffamily\bfseries\scriptsize, anchor=north] at (14.35,-9.9) {Escalation and alerts};
+\node[font=\sffamily\tiny, align=center, anchor=north] at (14.35,-10.3) {if $u>q_{0.95}(u^{\mathrm{cal}})$:\\VL/L $\rightarrow$ Moderate\\(both bounds preserved)};
+\node[anchor=north, inner sep=0pt, font=\sffamily\tiny] at (14.35,-11.35) {\renewcommand{\arraystretch}{1.05}\begin{tabular}{@{}l@{\ }l@{}}
+{\color{green!50!black!80}$\blacksquare$} VL & No alert\\
+{\color{green!40}$\blacksquare$} L & Routine monitoring\\
+{\color{yellow!80!black}$\blacksquare$} M & Doctor review\\
+{\color{orange}$\blacksquare$} H & Urgent alert\\
+{\color{red!80}$\blacksquare$} C & Emergency alert\end{tabular}};
+% arrows in C
+\draw[flow] (3.2,-11.6) -- (3.5,-11.6);
+\draw[flow] (7.85,-11.6) -- (8.15,-11.6);
+\draw[flow] (12.6,-11.6) -- (12.9,-11.6);
+\end{scope}
+% B -> C bus
+\draw[flow, rounded corners=5pt] (15.8,-3.0) -- (15.9,-3.0) -- (15.9,-7.78) -- (-0.2,-7.78) -- (-0.2,-10.45) -- (0.2,-10.45);
+\node[font=\sffamily\tiny, fill=white, inner sep=1pt] at (8.8,-7.78) {member logits $\ell_1,\dots,\ell_K$ for validation, calibration and new patients};
+\end{tikzpicture}

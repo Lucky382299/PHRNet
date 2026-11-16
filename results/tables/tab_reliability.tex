@@ -1,0 +1,24 @@
+\begin{table}[t]
+\centering
+\caption{Probability quality on the test split (lower is better). ECE is computed with 15 equal-width bins before (raw) and after temperature scaling fitted on the validation split.}
+\label{tab:reliability}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\resizebox{\columnwidth}{!}{\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{Brier} & \textbf{NLL} & \textbf{ECE (raw)} & \textbf{ECE} \\
+\midrule
+Logistic Regression & 0.0175$\pm$0.0003 & 0.0840$\pm$0.0022 & 0.0022$\pm$0.0008 & 0.0023$\pm$0.0007 \\
+Random Forest & 0.0176$\pm$0.0004 & 0.0878$\pm$0.0030 & 0.0048$\pm$0.0010 & 0.0050$\pm$0.0015 \\
+XGBoost & 0.0173$\pm$0.0003 & \textbf{0.0791$\pm$0.0021} & 0.0026$\pm$0.0012 & 0.0027$\pm$0.0007 \\
+LightGBM & 0.0175$\pm$0.0004 & 0.0802$\pm$0.0022 & 0.0029$\pm$0.0011 & 0.0028$\pm$0.0008 \\
+CatBoost & 0.0173$\pm$0.0003 & 0.0795$\pm$0.0020 & 0.0023$\pm$0.0014 & 0.0024$\pm$0.0011 \\
+MLP & 0.0173$\pm$0.0003 & 0.0809$\pm$0.0018 & 0.0028$\pm$0.0011 & 0.0026$\pm$0.0009 \\
+Attention-MLP + MC dropout & 0.0174$\pm$0.0003 & 0.0815$\pm$0.0015 & 0.0040$\pm$0.0012 & 0.0024$\pm$0.0013 \\
+Deep Ensemble (5 MLPs) & \textbf{0.0172$\pm$0.0003} & 0.0802$\pm$0.0018 & \textbf{0.0019$\pm$0.0008} & \textbf{0.0020$\pm$0.0009} \\
+FT-Transformer & 0.0172$\pm$0.0003 & 0.0801$\pm$0.0023 & 0.0034$\pm$0.0010 & 0.0027$\pm$0.0011 \\
+PHRNet (Proposed) & 0.0172$\pm$0.0003 & 0.0799$\pm$0.0021 & 0.0033$\pm$0.0013 & 0.0023$\pm$0.0014 \\
+\bottomrule
+\end{tabular}}
+\end{table}
